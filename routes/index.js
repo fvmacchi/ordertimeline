@@ -10,5 +10,15 @@ module.exports = function(controllers) {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  
+  res.render('search', {});
+});
+
+router.post('/search', function(req, res, next) {
+  var s = req.body.search;
+  if(!s) {
+    s = "";
+  }
+  c.database.searchOrders(s, function(orders) {
+    res.send(orders);
+  });
 });

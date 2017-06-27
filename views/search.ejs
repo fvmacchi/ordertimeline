@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Future Util</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+    
+    <link href="/css/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">Future</a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                        <li>
+                            <a href="index.html"><i class="fa fa-search fa-fw"></i> Search</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+        <!-- Page Content -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                      <h2>Search</h2>
+                      <div class="form-group input-group">
+                          <input id="search-bar" type="text" class="form-control">
+                          <span class="input-group-btn">
+                              <button class="btn btn-default" type="button"><i class="fa fa-search"></i>
+                              </button>
+                          </span>
+                      </div>
+                    </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div id="order-table" class="table-responsive">
+                      <table class="table table-hover">
+                        <thead>
+                          <tr>
+                            <td>Order Number</td>
+                            <td>Customer</td>
+                            <td>Glass Type</td>
+                            <td>Due Date</td>
+                          </tr>
+                        </thead>
+                        <tbody id="order-table-body">
+                          
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+            
+            <!-- templates -->
+            <div hidden>
+              
+              <span id="order-line-template">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td class="order-number"></td>
+                      <td class="order-customer"></td>
+                      <td class="order-type"></td>
+                      <td class="order-due-date"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </span>
+            </div>
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="/js/sb-admin-2.min.js"></script>
+    
+    <script src="/js/metisMenu.min.js"></script>
+    
+    <script>
+    
+    var performSearch = function() {
+      var s = $("#search-bar").val();
+      $.ajax({
+        method: "POST",
+        url:'/search',
+        data: {search: s},
+        success: function(data) {
+          renderOrders(data);
+        }
+      });
+    };
+    
+    var renderOrders = function(orders) {
+      if(!orders) {
+        $("#order-table").hide();
+        return;
+      }
+      var orderContainer = $("#order-table-body");
+      console.log(orderContainer)
+      orderContainer.html("");
+      orders.forEach(function(order) {
+        var orderElement = $("#order-line-template").find('tr').clone();
+        console.log(order)
+        orderElement.find('.order-number').html(order.RIF);
+        orderElement.find('.order-customer').html(order.DESCR1);
+        orderElement.find('.order-type').html(order.DESCMAT);
+        orderElement.find('.order-due-date').html((new Date(order.DATACONS)).toDateString());
+        orderElement.appendTo(orderContainer);
+      });
+      $("#order-table").show();
+    };
+    
+    $(document).ready(function() {
+      performSearch();
+    });
+    
+    </script>
+
+</body>
+
+</html>
