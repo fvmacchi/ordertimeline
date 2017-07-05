@@ -27,7 +27,9 @@ exports.getOrder = function(orderNum, callback) {
 };
 
 exports.searchOrders = function(s, callback) {
-  getQuery('active_orders', function(query) {
+  var query_code = s ? 'active_orders_search': 'active_orders';
+  getQuery(query_code, function(query) {
+    query = query.replace(new RegExp("@SEARCH_STRING",'g'), "'%"+s+"%'")
     new sql.Request().query(query, (err, result) => {
       if(err) {
         console.log(err);

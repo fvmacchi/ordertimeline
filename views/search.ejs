@@ -167,6 +167,9 @@
     };
     
     $(document).ready(function() {
+      $("#search-bar").change(function() {
+        performSearch();
+      });
       performSearch();
     });
     
