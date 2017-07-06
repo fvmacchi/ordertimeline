@@ -1,5 +1,6 @@
 var fs = require('fs');
 var sql = require('mssql');
+var ejs = require('ejs');
 var c = undefined;
 
 module.exports = function(controllers) {
@@ -27,9 +28,11 @@ exports.getOrder = function(orderNum, callback) {
 };
 
 exports.searchOrders = function(s, callback) {
-  var query_code = s ? 'active_orders_search': 'active_orders';
-  getQuery(query_code, function(query) {
-    query = query.replace(new RegExp("@SEARCH_STRING",'g'), "'%"+s+"%'")
+  getQuery('active_orders_search', function(query) {
+    query = ejs.render(query, {
+      broadSearch: true,
+      searchString: s
+    });
     new sql.Request().query(query, (err, result) => {
       if(err) {
         console.log(err);
