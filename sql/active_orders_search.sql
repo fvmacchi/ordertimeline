@@ -164,7 +164,7 @@ DECLARE @ITEMSDATA TABLE (
   RIGHT JOIN ORDITEMS_VENDITA_VIEW AS ordit
     on ord.ID_ORDINI=ordit.ID_ORDINI
   -- where shipping status is "to be delivered"
-  WHERE ((NOT ord.AVANZ=0)
+  WHERE ((NOT ord.AVANZ=2)
     AND (NOT ord.RIFCLI='CANCELLED')
     AND (NOT ord.RIFCLI='CANCELED')
     AND (NOT ord.COMMESSA_CLI='CANCELLED')
