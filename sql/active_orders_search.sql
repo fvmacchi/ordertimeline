@@ -132,6 +132,8 @@ DECLARE @ITEMSDATA TABLE (
            RACKCDL int,
            RIF varchar(10),
            DESCR1 varchar(255),
+           COMMESSA_CLI varchar(255),
+           DESCR_ANAGRAFICA varchar(255),
            rn int)
 	DECLARE @ELAB INT
 	
@@ -152,20 +154,28 @@ DECLARE @ITEMSDATA TABLE (
     it.DELIVERY_RACK, it.DELIVERY_RACKSORT, it.BATCH_RACKSORT, it.NUMTOTBARRE, it.LENTOTBARRE, it.WORKS_POSPZ, it.CheckLav, it.ZONE_CODICE, it.FLAGS_PROD, it.isrect, 
     it.PRODUCTION_TYPE, it.EWPOSPZ, it.WORKS_QTAPZ, it.ID_TIPILAVORAZIONE, it.URGENCY, it.ID_TIPICAUDOC, it.DELIVERY_STOP, it.ELAB, it.SEQX, it.X, it.Y, it.ROTANGLE, 
     it.EXTERNAL_ID_ITEMS, it.CAVALLETTO, it.TIPORACK, it.COLORESPECIALE, it.ID_RACKS, it.ID_RWKITS, it.RACKCDL, ord.RIF, ord.DESCR1,
-    rn = ROW_NUMBER() OVER (PARTITION BY ord.RIF,it.DESCMAT ORDER BY ord.DATACONS
+    ord.COMMESSA_CLI, ordit.DESCR_ANAGRAFICA,
+    rn = ROW_NUMBER() OVER (PARTITION BY ord.RIF,ordit.DESCR_ANAGRAFICA ORDER BY ord.DATACONS
     )
 	FROM ITEMS_VIEW it
-  <%=!broadSearch?'INNER':'RIGHT'%> join ORDINIVENDITA_VIEW as ord
+  <%=!broadSearch?'INNER':'RIGHT'%> JOIN ORDINIVENDITA_VIEW AS ord
   -- inner join ORDINI as ord
     on it.ID_ORDINI=ord.ID_ORDINI
+  RIGHT JOIN ORDITEMS_VENDITA_VIEW AS ordit
+    on ord.ID_ORDINI=ordit.ID_ORDINI
   -- where shipping status is "to be delivered"
-  WHERE ((NOT ord.AVANZ=2)
+  WHERE ((NOT ord.AVANZ=0)
     AND (NOT ord.RIFCLI='CANCELLED')
     AND (NOT ord.RIFCLI='CANCELED')
     AND (NOT ord.COMMESSA_CLI='CANCELLED')
-    AND (NOT ord.COMMESSA_CLI='CANCELED'))<% if(searchString) { %>
+    AND (NOT ord.COMMESSA_CLI='CANCELED'))
+    <% if(searchString) { %>
     AND (ord.RIF LIKE '%<%=searchString%>%'
-      OR ord.DESCR1 LIKE '%<%=searchString%>%')<% } %>
+      OR ord.DESCR1 LIKE '%<%=searchString%>%'
+      OR ord.COMMESSA_CLI LIKE '%<%=searchString%>%'
+      OR ordit.DESCR_ANAGRAFICA LIKE '%<%=searchString%>%'
+    )
+    <% } %>
 	order by ord.DATACONS
 	
 	-- DECLARE L CURSOR LOCAL FOR
