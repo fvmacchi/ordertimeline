@@ -142,12 +142,12 @@ DECLARE @ITEMSDATA TABLE (
 	it.POSPZ, it.EXCEED, it.CODMAT, it.SAGOMA, it.DIMXPZ, it.DIMYPZ, it.ID_UM, it.MOLATURA, it.TIPOROTAZ, it.NRETICH, it.NOTES, it.PZSTD, 
 	it.TESTOFISSO, it.DISTLISTELLO, it.NOTE1, it.NOTE2,it.NOTE3, it.NOTE4, it.NOTE5, it.NOTE6, it.NOTE7, it.NOTE8, it.NOTE9, it.NOTE10, 
 	it.SAGNOTES, it.DIMXPZR, it.DIMYPZR, it.NOTE11, it.NOTE12, it.NOTE13, it.NOTE14, it.NOTE15, it.NOTE16, it.NOTE17, 
-    it.NOTE18, it.NOTE19, it.NOTE20, it.MX1, it.MX2, it.MY1, it.MY2, it.ID_ORDINI, it.MASTLABS, it.AREA, it.PERIMETRO, it.AREATOT, 
+    it.NOTE18, it.NOTE19, it.NOTE20, it.MX1, it.MX2, it.MY1, it.MY2, ord.ID_ORDINI, it.MASTLABS, it.AREA, it.PERIMETRO, it.AREATOT, 
     it.PERIMETROTOT, it.TIPOVETRO, it.STATO, it.DESCR_MAT_COMP, 
     it.ID_PZ, it.DELETED, it.ID_LOTTI, it.ORDINE, it.RIFCLI, it.ID_PERSONE, it.DATAINS, it.DATAORD, ord.DATACONS, it.ORDINI_STATO, 
     it.PREV, it.DEF, it.INTERNAL, it.CLIENTE, it.LOTTI_CODICE, 
     it.RACK, it.ORDRACK, it.LAVQTAPZ, it.LAVQTADONE, it.LAVQTATODO, it.RACKSORT, it.ID_DETT, it.ID_COMMESSE, it.ID_ITEMS, it.ID_DBASEORDINI, 
-    it.ID_ORDDETT, it.ID_ORDMAST, 
+    it.ID_ORDDETT, ordit.ID_ORDMAST, 
     it.ID_MAGAZ, it.CODCOM, it.DESCMAT, it.SPESMAT, it.COLORE, it.WORKKIND_CODICE, it.WORKDESC, it.PRIOWORK, it.ID_WORKKIND, it.RIGA, it.QTAPZ, 
     it.PRIOPZ, it.PREFEPZ, 
     it.ID_LAVORAZIONI, it.QTADONE, it.ID_WORKS, it.DIMENSIONE_X, it.DIMENSIONE_Y, it.DIMENSIONE_Z, it.QUADRATURA, it.RACKGROUP, it.FORO, it.PROGR, it.RACKNO, 
@@ -170,6 +170,11 @@ DECLARE @ITEMSDATA TABLE (
     AND (NOT ord.COMMESSA_CLI='CANCELLED')
     AND (NOT ord.COMMESSA_CLI='CANCELED'))
     <% if(searchString) { %>
+    <% if(prevResults) { %>
+    AND ordit.ID_ORDMAST IN (<%-prevResults.map(function(result) {
+      return "'" + result + "'";
+    }).join(',')%>)
+    <% } %>
     AND (ord.RIF LIKE '%<%=searchString%>%'
       OR ord.DESCR1 LIKE '%<%=searchString%>%'
       OR ord.COMMESSA_CLI LIKE '%<%=searchString%>%'

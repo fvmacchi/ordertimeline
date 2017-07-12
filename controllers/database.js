@@ -27,11 +27,12 @@ exports.getOrder = function(orderNum, callback) {
   });
 };
 
-exports.searchOrders = function(s, callback) {
+exports.searchOrders = function(options, callback) {
   getQuery('active_orders_search', function(query) {
     query = ejs.render(query, {
       broadSearch: true,
-      searchString: s
+      searchString: options.search,
+      prevResults: options.prevResults
     });
     new sql.Request().query(query, (err, result) => {
       if(err) {

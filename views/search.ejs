@@ -136,12 +136,19 @@
     
     <script>
     
+    var result_ids = {};
     var performSearch = function() {
       var s = $("#search-bar").val();
+      if(!s) {
+        result_ids = {};
+      }
       $.ajax({
         method: "POST",
         url:'/search',
-        data: {search: s},
+        data: {
+          search: s,
+          prevResults: Object.keys(result_ids)
+        },
         success: function(data) {
           renderOrders(data);
         }
@@ -154,11 +161,11 @@
         return;
       }
       var orderContainer = $("#order-table-body");
-      console.log(orderContainer)
       orderContainer.html("");
+      result_ids = {};
       orders.forEach(function(order) {
+        result_ids[order.ID_ORDMAST] = true;
         var orderElement = $("#order-line-template").find('tr').clone();
-        console.log(order)
         orderElement.find('.order-number').html(order.RIF);
         orderElement.find('.order-customer').html(order.DESCR1);
         orderElement.find('.order-customer-po').html(order.COMMESSA_CLI);

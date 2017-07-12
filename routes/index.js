@@ -15,10 +15,15 @@ router.get('/', function(req, res, next) {
 
 router.post('/search', function(req, res, next) {
   var s = req.body.search;
+  var prevResults = req.body.prevResults;
+  console.log(req.body)
   if(!s) {
     s = "";
   }
-  c.database.searchOrders(s, function(orders) {
+  c.database.searchOrders({
+    search: s,
+    prevResults: prevResults
+  }, function(orders) {
     res.send(orders);
   });
 });
