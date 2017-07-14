@@ -165,10 +165,10 @@ DECLARE @ITEMSDATA TABLE (
     on ord.ID_ORDINI=ordit.ID_ORDINI
   -- where shipping status is "to be delivered"
   WHERE ((NOT ord.AVANZ=2)
-    AND (NOT ord.RIFCLI='CANCELLED')
-    AND (NOT ord.RIFCLI='CANCELED')
-    AND (NOT ord.COMMESSA_CLI='CANCELLED')
-    AND (NOT ord.COMMESSA_CLI='CANCELED'))
+    AND (NOT ISNULL(ord.RIFCLI,'')='CANCELLED')
+    AND (NOT ISNULL(ord.RIFCLI,'')='CANCELED')
+    AND (NOT ISNULL(ord.COMMESSA_CLI,'')='CANCELLED')
+    AND (NOT ISNULL(ord.COMMESSA_CLI,'')='CANCELED'))
     <% if(searchString) { %>
     <% if(prevResults) { %>
     AND ordit.ID_ORDMAST IN (<%-prevResults.map(function(result) {
