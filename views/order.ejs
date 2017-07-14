@@ -28,7 +28,13 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
+    <style>
+    .btn-tiny {
+      width: 20px;
+      height: 20px;
+      padding: 1px;
+    }
+    </style>
 </head>
 
 <body>
@@ -66,31 +72,44 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-6">
-                      <h2>Search</h2>
-                      <div class="form-group input-group">
-                          <input id="search-bar" type="text" class="form-control">
-                          <span class="input-group-btn">
-                              <button class="btn btn-default" type="button"><i class="fa fa-search"></i>
-                              </button>
-                          </span>
-                      </div>
+                      <h2>Order <%=order.RIF%></h2>
                     </div>
                 </div>
                 <div class="row">
                   <div class="col-md-12">
                     <div id="order-table" class="table-responsive">
                       <table class="table table-hover">
-                        <thead>
+                        <tbody>
+                        <% order.lines.forEach(function(line) { %>
                           <tr>
-                            <td>Order Number</td>
-                            <td>Customer</td>
-                            <td>Customer PO</td>
-                            <td>Glass Type</td>
-                            <td>Due Date</td>
+                            <th>Line: <%=line.RIGA%></th>
+                            <th><%=line.CODMAT%></td>
+                            <%
+                            if(line.pieces) {
+                              line.pieces[0].workings.forEach(function(working) {
+                            %>
+                            <th><%=working.WORKKIND_CODICE%></td>
+                            <%
+                              });
+                            }
+                            %>
                           </tr>
-                        </thead>
-                        <tbody id="order-table-body">
-                          
+                          <% line.pieces.forEach(function(piece) { %>
+                            <tr>
+                              <td><%=piece.PROGR%></td>
+                              <td></td>
+                              <% piece.workings.forEach(function(working) { %>
+                                <td>
+                                  <% if(working.STATO == 1 || working.STATO == 99) { %>
+                                  <button class="btn btn-tiny btn-<%=working.STATO==99?'info':'warning'%> btn-circle"><i class="fa fa-<%=working.STATO==99?'check':'times'%>"></i></button>
+                                  <% } else { %>
+                                  <%=working.STATO%>
+                                  <% } %>
+                                </td>
+                              <% }); %>
+                            </tr>
+                          <% }); %>
+                        <% }); %>
                         </tbody>
                       </table>
                     </div>
@@ -136,58 +155,6 @@
     
     <script>
     
-    var result_ids = {};
-    var performSearch = function() {
-      var s = $("#search-bar").val();
-      if(!s) {
-        result_ids = {};
-      }
-      $.ajax({
-        method: "POST",
-        url:'/search',
-        data: {
-          search: s,
-          prevResults: Object.keys(result_ids)
-        },
-        success: function(data) {
-          renderOrders(data);
-        }
-      });
-    };
-    
-    var renderOrders = function(orders) {
-      if(!orders) {
-        $("#order-table").hide();
-        return;
-      }
-      var orderContainer = $("#order-table-body");
-      orderContainer.html("");
-      result_ids = {};
-      orders.forEach(function(order) {
-        result_ids[order.ID_ORDMAST] = true;
-        var orderElement = $("#order-line-template").find('tr').clone();
-        orderElement.find('.order-number').html(order.RIF);
-        orderElement.find('.order-customer').html(order.DESCR1);
-        orderElement.find('.order-customer-po').html(order.COMMESSA_CLI);
-        orderElement.find('.order-type').html(order.DESCR_ANAGRAFICA);
-        orderElement.find('.order-due-date').html((new Date(order.DATACONS)).toDateString());
-        orderElement.data('href', "/order/" + order.ID_ORDINI);
-        
-        orderElement.click(function() {
-          window.location = $(this).data('href');
-        });
-        
-        orderElement.appendTo(orderContainer);
-      });
-      $("#order-table").show();
-    };
-    
-    $(document).ready(function() {
-      $("#search-bar").change(function() {
-        performSearch();
-      });
-      performSearch();
-    });
     
     </script>
 

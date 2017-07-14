@@ -16,7 +16,6 @@ router.get('/', function(req, res, next) {
 router.post('/search', function(req, res, next) {
   var s = req.body.search;
   var prevResults = req.body.prevResults;
-  console.log(req.body)
   if(!s) {
     s = "";
   }
@@ -25,5 +24,16 @@ router.post('/search', function(req, res, next) {
     prevResults: prevResults
   }, function(orders) {
     res.send(orders);
+  });
+});
+
+router.get('/order/:order_id', function(req, res, next) {
+  var order_id = req.params.order_id;
+  c.database.getOrderWithWorkings({
+    id: order_id
+  }, function(order) {
+    res.render('order', {
+      order: order
+    });
   });
 });

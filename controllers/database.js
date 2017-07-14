@@ -1,6 +1,7 @@
 var fs = require('fs');
 var sql = require('mssql');
 var ejs = require('ejs');
+var async = require('async');
 var c = undefined;
 
 module.exports = function(controllers) {
@@ -28,26 +29,80 @@ exports.getOrder = function(orderNum, callback) {
 };
 
 exports.searchOrders = function(options, callback) {
-  getQuery('active_orders_search', function(query) {
-    query = ejs.render(query, {
-      broadSearch: true,
-      searchString: options.search,
-      prevResults: options.prevResults
-    });
-    new sql.Request().query(query, (err, result) => {
-      if(err) {
-        console.log(err);
-      }
-      callback(result.recordset);
-    });
+  getQuery('active_orders_search', {
+    broadSearch: false,
+    searchString: options.search,
+    prevResults: options.prevResults
+  }, function(results) {
+    return callback(results);
   });
 };
 
-var getQuery = function(query, callback) {
+exports.getOrderWithWorkings = function(options, callback) {
+  var workings = undefined;
+  var order = undefined;
+  async.parallel([
+    function(callback) {
+      getQuery('order_with_workings', {
+        order_id: options.id
+      }, function(results) {
+        workings = results;
+        return callback();
+      });
+    },
+    function(callback) {
+      getQuery('order', {
+        order_id: options.id
+      }, function(results) {
+        order = results[0];
+        return callback();
+      });
+    }
+  ],
+  
+  
+  
+  function() {
+    order.lines = [];
+    var line = {};
+    var pieces = [];
+    var piece = {};
+    workings.forEach(function(working) {
+      if(working.RIGA+","+working.PROGR != piece.RIGA+","+piece.PROGR) {
+        piece = {};
+        piece.workings = [];
+        Object.assign(piece, working);
+        pieces.push(piece);
+      }
+      piece.workings.push(working);
+    });
+    pieces.forEach(function(piece) {
+      if(piece.RIGA != line.RIGA) {
+        line = {};
+        Object.assign(line,piece);
+        line.pieces = [];
+        order.lines.push(line);
+      }
+      line.pieces.push(piece);
+    });
+    return callback(order);
+  });
+  
+  
+};
+
+var getQuery = function(query, ejs_data, callback) {
   fs.readFile('./sql/' + query + '.sql', 'utf8', function(err, data) {
     if(err) {
       return console.log(err);
     }
-    return callback(data);
+    var query = ejs.render(data, ejs_data);
+    new sql.Request().query(query, (err, result) => {
+      if(err) {
+        console.log(err);
+        return callback(null);
+      }
+      return callback(result.recordset);
+    });
   });
 };
