@@ -38,6 +38,14 @@
       background-color: rgba(255,255,255,0.8);
       z-index:1000;
     }
+    #table-overlay {
+      z-index:1000;
+      display: block;
+      background-color: rgba(0,0,0,0);
+      position: absolute;
+      width:100px;
+      height:100px;
+    }
     
     .loader,
     .loader:after {
@@ -148,6 +156,8 @@
                           
                         </tbody>
                       </table>
+                      <a id="table-overlay" href="#">
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -232,13 +242,9 @@
         orderElement.find('.order-type').html(order.DESCR_ANAGRAFICA);
         orderElement.find('.order-due-date').html((new Date(order.DATACONS)).toDateString());
         orderElement.data('href', "/order/" + order.ID_ORDINI);
-        
-        orderElement.click(function() {
-          window.location = $(this).data('href');
-        });
-        
         orderElement.appendTo(orderContainer);
       });
+      initRows();
       $("#order-table").show();
     };
     
@@ -255,7 +261,21 @@
     var hideOverlay = function() {
       $("#overlay").hide();
     }
-       
+
+    var initRows = function() {
+      $("tbody").find('tr').hover(function() {
+        //IN
+        var e = $(this);
+        var o = $("#table-overlay");
+        o.offset({top:e.offset().top,left:e.offset().left});
+        o.width(e.width());
+        o.height(e.height());
+        o.attr('href', e.data('href'));
+      },
+      function() {
+        //OUT
+      });
+    }
     </script>
 
 </body>
