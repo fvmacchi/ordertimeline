@@ -80,6 +80,17 @@
                     <div id="order-table" class="table-responsive">
                       <table class="table table-hover">
                         <tbody>
+                        <%
+                        // Get max amount of workings
+                        var maxWorkings = 0;
+                        order.lines.forEach(function(line) {
+                          line.pieces.forEach(function(piece) {
+                            if(piece.workings.length > maxWorkings) {
+                              maxWorkings = piece.workings.length;
+                            }
+                          });
+                        });
+                        %>
                         <% order.lines.forEach(function(line) { %>
                           <tr>
                             <th>Line: <%=line.RIGA%></th>
@@ -91,6 +102,11 @@
                             <th><%=working.WORKKIND_CODICE%></td>
                             <%
                               });
+                              for(var i = line.pieces[0].workings.length; i < maxWorkings; i++) {
+                            %>
+                              <th>
+                            <%  
+                              }
                             }
                             %>
                           </tr>
@@ -107,6 +123,9 @@
                                   <% } %>
                                 </td>
                               <% }); %>
+                              <% for(var i = piece.workings.length; i < maxWorkings; i++) { %>
+                                <td></td>
+                              <% } %>
                             </tr>
                           <% }); %>
                         <% }); %>
