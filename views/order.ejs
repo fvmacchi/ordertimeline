@@ -71,60 +71,81 @@
         <div id="page-wrapper">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-6">
-                      <h2>Order <%=order.RIF%></h2>
+                    <div class="col-md-3">
+                      <h4><%=order.RIF%></h4>
+                    </div>
+                    <div class="col-md-3">
+                      <h4><%=order.DESCR1%></h4>
+                    </div>
+                    <div class="col-md-3">
+                      <h4><%=order.COMMESSA_CLI%></h4>
+                    </div>
+                    <div class="col-md-3">
+                      <h4><%=(new Date(order.DATACONS)).toDateString()%></h2>
                     </div>
                 </div>
                 <div class="row">
                   <div class="col-md-12">
                     <div id="order-table" class="table-responsive">
-                      <table class="table table-hover">
+                      <table class="table table-bordered">
                         <tbody>
                         <%
-                        // Get max amount of workings
-                        var maxWorkings = 0;
+                        // Get list of workings
+                        var workingsMap = {};
                         order.lines.forEach(function(line) {
                           line.pieces.forEach(function(piece) {
-                            if(piece.workings.length > maxWorkings) {
-                              maxWorkings = piece.workings.length;
-                            }
+                            piece.workings.forEach(function(working) {
+                              workingsMap[working.WORKKIND_CODICE] = working.PRIOWORK;
+                            });
                           });
+                        });
+                        var workingsList = [];
+                        Object.keys(workingsMap).forEach(function(workkind) {
+                          workingsList.push({work: workkind,priority:workingsMap[workkind]});
+                        });
+                        workingsList.sort(function(a,b) {return a.priority-b.priority});
+                        workingsMap = {};
+                        workingsList.forEach(function(work, i) {
+                          workingsMap[work.work] = i;
                         });
                         %>
                         <% order.lines.forEach(function(line) { %>
                           <tr>
                             <th>Line: <%=line.RIGA%></th>
-                            <th><%=line.CODMAT%></td>
+                            <th><%=line.CODMAT%></th>
+                            <th><%=line.DIMX_INCH + ' x ' + line.DIMY_INCH%></th>
+                          </tr>
+                          <tr>
+                            <th>
                             <%
-                            if(line.pieces) {
-                              line.pieces[0].workings.forEach(function(working) {
+                            workingsList.forEach(function(working) {
                             %>
-                            <th><%=working.WORKKIND_CODICE%></td>
+                            <td class="text-center"><%=working.work%></td>
                             <%
-                              });
-                              for(var i = line.pieces[0].workings.length; i < maxWorkings; i++) {
-                            %>
-                              <th>
-                            <%  
-                              }
-                            }
+                            });
                             %>
                           </tr>
                           <% line.pieces.forEach(function(piece) { %>
                             <tr>
                               <td><%=piece.PROGR%></td>
-                              <td></td>
-                              <% piece.workings.forEach(function(working) { %>
-                                <td>
-                                  <% if(working.STATO == 1 || working.STATO == 99) { %>
-                                  <button class="btn btn-tiny btn-<%=working.STATO==99?'info':'warning'%> btn-circle"><i class="fa fa-<%=working.STATO==99?'check':'times'%>"></i></button>
-                                  <% } else { %>
-                                  <%=working.STATO%>
+                              <%
+                              var compWorkList = new Array();
+                              piece.workings.forEach(function(working) {
+                                compWorkList[workingsMap[working.WORKKIND_CODICE]] = {STATO:working.STATO};
+                              });
+                              for(var i = 0; i < workingsList.length; i++) {
+                                var working = compWorkList[i];
+                                console.log(working)
+                              %>
+                                <td class="text-center">
+                                  <% if(working) { %>
+                                    <% if(working.STATO == 1 || working.STATO == 99) { %>
+                                    <button class="btn btn-tiny btn-<%=working.STATO==99?'info':'warning'%> btn-circle"><i class="fa fa-<%=working.STATO==99?'check':'times'%>"></i></button>
+                                    <% } else { %>
+                                    <%=working.STATO%>
+                                    <% } %>
                                   <% } %>
                                 </td>
-                              <% }); %>
-                              <% for(var i = piece.workings.length; i < maxWorkings; i++) { %>
-                                <td></td>
                               <% } %>
                             </tr>
                           <% }); %>

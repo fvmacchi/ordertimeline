@@ -68,6 +68,10 @@ exports.getOrderWithWorkings = function(options, callback) {
     var pieces = [];
     var piece = {};
     workings.forEach(function(working) {
+      //calculate dimensions
+      working.DIMX_INCH = toFraction(working.DIMXPZR/25.4);
+      working.DIMY_INCH = toFraction(working.DIMYPZR/25.4);
+      
       if(working.RIGA+","+working.PROGR != piece.RIGA+","+piece.PROGR) {
         piece = {};
         piece.workings = [];
@@ -105,4 +109,21 @@ var getQuery = function(query, ejs_data, callback) {
       return callback(result.recordset);
     });
   });
+};
+
+var toFraction = function(x) {
+  var output = Math.floor(x) + "";
+  var xr = Math.floor((x - Math.floor(x))*10000)/10000.0;
+  if(xr > 0) {
+    xr = Math.round(xr*32);
+    xd = 32;
+    while(xr % 2 == 0) {
+      xr /= 2;
+      xd /= 2;
+    }
+    if(xr != 0) {
+      output += " " + xr+"/"+xd;
+    }
+  }
+  return output;
 };

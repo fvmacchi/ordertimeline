@@ -128,8 +128,9 @@ DECLARE @ITEMSDATA TABLE (
            COLORESPECIALE int,
            ID_RACKS int,
            ID_RWKITS int,
-           RACKCDL int,
-           DESCR_ANAGRAFICA varchar(255)
+           RACKCDL int
+          --  DESCR_ANAGRAFICA varchar(255),
+          --  LIV int
         )
 	DECLARE @ELAB INT
 	
@@ -149,13 +150,13 @@ DECLARE @ITEMSDATA TABLE (
     it.ID_LAVORAZIONI, it.QTADONE, it.ID_WORKS, it.DIMENSIONE_X, it.DIMENSIONE_Y, it.DIMENSIONE_Z, it.QUADRATURA, it.RACKGROUP, it.FORO, it.PROGR, it.RACKNO, 
     it.DELIVERY_RACK, it.DELIVERY_RACKSORT, it.BATCH_RACKSORT, it.NUMTOTBARRE, it.LENTOTBARRE, it.WORKS_POSPZ, it.CheckLav, it.ZONE_CODICE, it.FLAGS_PROD, it.isrect, 
     it.PRODUCTION_TYPE, it.EWPOSPZ, it.WORKS_QTAPZ, it.ID_TIPILAVORAZIONE, it.URGENCY, it.ID_TIPICAUDOC, it.DELIVERY_STOP, it.ELAB, it.SEQX, it.X, it.Y, it.ROTANGLE, 
-    it.EXTERNAL_ID_ITEMS, it.CAVALLETTO, it.TIPORACK, it.COLORESPECIALE, it.ID_RACKS, it.ID_RWKITS, it.RACKCDL,
-    work.DESCR_ANAGRAFICA
+    it.EXTERNAL_ID_ITEMS, it.CAVALLETTO, it.TIPORACK, it.COLORESPECIALE, it.ID_RACKS, it.ID_RWKITS, it.RACKCDL
+    -- work.DESCR_ANAGRAFICA, work.LIV
     -- rn = ROW_NUMBER() OVER (PARTITION BY ord.RIF,ordit.DESCR_ANAGRAFICA ORDER BY ord.DATACONS)
 	FROM ITEMS_VIEW it
-  LEFT JOIN DBASEORDINI_PREVENTIVI_VIEW AS work
-    on it.ID_ORDMAST=work.ID_ORDMAST
-  -- where shipping status is "to be delivered"
+  -- LEFT JOIN DBASEORDINI_PREVENTIVI_VIEW AS work
+  --   on it.ID_ORDMAST=work.ID_ORDMAST
+  -- -- where shipping status is "to be delivered"
   WHERE 
     it.ID_ORDINI = '<%=order_id%>'
 	
