@@ -32,8 +32,15 @@ exports.searchOrders = function(options, callback) {
   getQuery('active_orders_search', {
     broadSearch: false,
     searchString: options.search,
-    prevResults: options.prevResults
+    prevResults: options.prevResults,
+    workingsNeeded: options.workingsNeeded
   }, function(results) {
+    return callback(results);
+  });
+};
+
+exports.getWorkingsInProduction = function(callback) {
+  getQuery('active_orders_workings', {}, function(results) {
     return callback(results);
   });
 };

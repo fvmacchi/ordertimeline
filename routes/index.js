@@ -10,18 +10,24 @@ module.exports = function(controllers) {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('search', {});
+  c.database.getWorkingsInProduction(function(workings) {
+    res.render('search', {
+      workings: workings
+    });
+  });
 });
 
 router.post('/search', function(req, res, next) {
   var s = req.body.search;
   var prevResults = req.body.prevResults;
+  var workingsNeeded = req.body.workingsNeeded;
   if(!s) {
     s = "";
   }
   c.database.searchOrders({
     search: s,
-    prevResults: prevResults
+    prevResults: prevResults,
+    workingsNeeded: workingsNeeded
   }, function(orders) {
     res.send(orders);
   });

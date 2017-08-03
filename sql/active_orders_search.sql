@@ -181,6 +181,13 @@ DECLARE @ITEMSDATA TABLE (
       OR ordit.DESCR_ANAGRAFICA LIKE '%<%=searchString%>%'
     )
     <% } %>
+    <% if(workingsNeeded){ %>
+    AND it.WORKKIND_CODICE in (<%-workingsNeeded.map(function(result) {
+      return "'" + result + "'";
+    })%>)
+    AND it.STATO=1
+    <% } %>
+    
 	order by ord.DATACONS
 	
 	-- DECLARE L CURSOR LOCAL FOR
