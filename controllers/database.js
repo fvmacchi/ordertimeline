@@ -112,18 +112,25 @@ var getQuery = function(query, ejs_data, callback) {
 };
 
 var toFraction = function(x) {
+  var whole_number = Math.floor(x);
+  var fraction = "";
   var output = Math.floor(x) + "";
   var xr = Math.floor((x - Math.floor(x))*10000)/10000.0;
   if(xr > 0) {
     xr = Math.round(xr*32);
     xd = 32;
-    while(xr % 2 == 0) {
+    if(xr == xd) {
+      whole_number += 1;
+      xr = 0;
+    }
+    while(xr % 2 == 0 && xr != 0) {
       xr /= 2;
       xd /= 2;
     }
+    
     if(xr != 0) {
-      output += " " + xr+"/"+xd;
+      fraction = xr+"/"+xd;
     }
   }
-  return output;
+  return whole_number + (fraction? " " + fraction : "");
 };
