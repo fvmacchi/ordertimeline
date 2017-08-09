@@ -139,8 +139,28 @@
                               %>
                                 <td class="text-center">
                                   <% if(working) { %>
-                                    <% if(working.STATO == 1 || working.STATO == 99) { %>
-                                    <button class="btn btn-tiny btn-<%=working.STATO==99?'info':'warning'%> btn-circle"><i class="fa fa-<%=working.STATO==99?'check':'times'%>"></i></button>
+                                    <% if(working.STATO == 1 || working.STATO == 99 || working.STATO == 2) { 
+
+                                      var icon = '';
+                                      var btn = '';
+                                      switch(working.STATO) {
+                                        case 1:
+                                          icon = 'times';
+                                          btn = 'warning';
+                                          break;
+                                        case 2:
+                                          icon = 'cogs';
+                                          btn = 'primary';
+                                          break;
+                                        case 99:
+                                          icon = 'check';
+                                          btn = 'info';
+                                          break
+                                        default:
+                                          icon = '';
+                                      }
+                                      %>
+                                    <button class="btn btn-tiny btn-<%=btn%> btn-circle"><i class="fa fa-<%=icon%>"></i></button>
                                     <% } else { %>
                                     <%=working.STATO%>
                                     <% } %>
